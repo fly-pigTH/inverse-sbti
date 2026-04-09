@@ -2,6 +2,8 @@
 
 A tribute reverse-engineering study of `https://sbti.unun.dev/`, built for learning and research.
 
+中文版本见 [README.zh-CN.md](./README.zh-CN.md).
+
 ## Tribute
 
 This repository is dedicated to the public `SBTI 人格测试` page hosted at `sbti.unun.dev`.
