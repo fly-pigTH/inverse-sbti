@@ -190,6 +190,9 @@ h1 {
 
 .btn {
   appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: none;
   border-radius: 999px;
   padding: 14px 20px;
@@ -836,6 +839,16 @@ h1 {
     min-width: 0;
   }
 
+  .progress-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .test-head h2 {
+    font-size: clamp(1.75rem, 9vw, 2.3rem);
+  }
+
   h1 {
     font-size: clamp(4rem, 22vw, 7rem);
   }
@@ -853,7 +866,185 @@ h1 {
     text-align: left;
   }
 
+  .question-card {
+    padding: 14px;
+  }
+
+  .question-card.is-active-question {
+    transform: none;
+  }
+
+  .question-head {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .question-title {
+    margin-top: 10px;
+    font-size: 15px;
+    line-height: 1.82;
+  }
+
+  .options {
+    margin-top: 12px;
+    gap: 8px;
+  }
+
+  .option {
+    grid-template-columns: auto 22px 1fr;
+    gap: 10px;
+    padding: 14px 12px;
+  }
+
+  .option:hover {
+    transform: none;
+  }
+
+  .option input {
+    margin-top: 3px;
+    transform: scale(1.08);
+  }
+
+  .vector-panel {
+    top: 8px;
+    padding: 14px;
+    box-shadow: 0 16px 32px rgba(31, 23, 13, 0.12);
+  }
+
+  .vector-panel-head h3 {
+    margin-top: 10px;
+    font-size: 1.22rem;
+  }
+
+  .vector-focus,
+  .vector-branch-hint {
+    margin-top: 10px;
+    font-size: 12px;
+    line-height: 1.72;
+  }
+
   .vector-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    display: flex;
+    grid-template-columns: none;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 2px 2px 6px;
+    margin: 14px -2px 0;
+    scroll-snap-type: x proximity;
+    scrollbar-width: thin;
+  }
+
+  .vector-node {
+    flex: 0 0 148px;
+    min-width: 148px;
+    scroll-snap-align: start;
+  }
+
+  .test-actions {
+    align-items: stretch;
+  }
+
+  .test-actions > .subtle,
+  .test-actions > #testHint {
+    width: 100%;
+  }
+
+  .action-row {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .action-row > .btn,
+  .action-row > a.btn {
+    width: 100%;
+  }
+
+  .hero-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .hero-actions > .btn,
+  .hero-actions > a.btn {
+    width: 100%;
+  }
+
+  .poster-card {
+    min-height: 300px;
+  }
+
+  .summary-card h3 {
+    font-size: 1.2rem;
+  }
+
+  .summary-card p,
+  .dim-item p {
+    font-size: 12px;
+    line-height: 1.72;
+  }
+
+  .dim-item {
+    padding: 12px;
+  }
+
+  .top-match {
+    align-items: start;
+  }
+}
+
+@media (max-width: 480px) {
+  .shell {
+    width: calc(100vw - 12px);
+    padding-top: 6px;
+  }
+
+  .hero-frame,
+  .test-panel,
+  .result-panel {
+    padding: 14px;
+  }
+
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+  }
+
+  .hero-lead {
+    font-size: 15px;
+    line-height: 1.82;
+  }
+
+  .manifest-card ul {
+    line-height: 1.72;
+    padding-left: 16px;
+  }
+
+  .progress-bar {
+    height: 10px;
+  }
+
+  .question-index,
+  .question-dim,
+  .progress-meta,
+  .vector-type-preview,
+  .vector-node-name,
+  .vector-node-score,
+  .vector-node-sub {
+    font-size: 11px;
+  }
+
+  .option {
+    padding: 13px 11px;
+  }
+
+  .vector-node {
+    flex-basis: 138px;
+    min-width: 138px;
+    padding: 11px;
+  }
+
+  .match-badge {
+    padding: 9px 12px;
+    font-size: 12px;
   }
 }
