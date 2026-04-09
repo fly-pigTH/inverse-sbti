@@ -98,10 +98,12 @@ export function loadSiteData(htmlPath = DEFAULT_HTML_PATH) {
   const html = readSiteHtml(htmlPath);
   const script = extractMainScript(html);
 
+  const dimensionMeta = extractConst(script, 'dimensionMeta');
   const questions = extractConst(script, 'questions');
   const specialQuestions = extractConst(script, 'specialQuestions');
   const typeLibrary = extractConst(script, 'TYPE_LIBRARY');
   const normalTypes = extractConst(script, 'NORMAL_TYPES');
+  const dimExplanations = extractConst(script, 'DIM_EXPLANATIONS');
   const dimensionOrder = extractConst(script, 'dimensionOrder');
   const drunkTriggerQuestionId = extractConst(script, 'DRUNK_TRIGGER_QUESTION_ID');
 
@@ -121,10 +123,12 @@ export function loadSiteData(htmlPath = DEFAULT_HTML_PATH) {
   return {
     sourceUrl: 'https://sbti.unun.dev/',
     htmlPath,
+    dimensionMeta,
     questions,
     specialQuestions,
     typeLibrary,
     normalTypes,
+    dimExplanations,
     typeVectors: buildTypeVectors(normalTypes),
     dimensionOrder,
     drunkTriggerQuestionId,

@@ -6,6 +6,7 @@
   "description": "Tribute reverse-engineering study of sbti.unun.dev for learning and research.",
   "scripts": {
     "fetch": "node scripts/fetch-site.mjs",
+    "export:site-data": "node scripts/export-browser-data.mjs",
     "verify": "node scripts/verify-parity.mjs",
     "report": "node scripts/reverse-sbti.mjs report",
     "summary": "node scripts/reverse-sbti.mjs summary",

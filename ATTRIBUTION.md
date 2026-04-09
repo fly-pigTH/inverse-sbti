@@ -15,7 +15,9 @@ This repository is a tribute and research project based on the public website:
 ## Upstream Content
 
 - Rights to the original site content remain with the upstream author and site owner.
-- The repository does not bundle the fetched upstream HTML snapshot, generated assets, or image files by default.
+- The repository does not bundle the fetched upstream HTML snapshot or the upstream image files by default.
+- The deployed open-source rebuild in `site/` includes upstream-derived questionnaire text, type labels, and type descriptions extracted from the public page for tribute/research purposes.
+- Those upstream-derived content fields are not relicensed under this repository's MIT license.
 - If you fetch upstream content locally with the provided scripts, review the upstream terms and use it only in ways you are allowed to.
 
 ## Intent

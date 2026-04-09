@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Open SBTI</title>
+    <meta
+      name="description"
+      content="一个面向学习研究的开源版 SBTI 重建项目，致敬 sbti.unun.dev。"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Serif+SC:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="page-bg" aria-hidden="true">
+      <div class="page-noise"></div>
+      <div class="orb orb-a"></div>
+      <div class="orb orb-b"></div>
+      <div class="grid-fade"></div>
+    </div>
+
+    <main class="shell">
+      <section id="homeScreen" class="screen screen-home active">
+        <div class="hero-frame panel">
+          <div class="hero-copy">
+            <div class="eyebrow">Open-Source Tribute Build</div>
+            <h1>Open SBTI</h1>
+            <p class="hero-lead">
+              一个面向学习与研究的开源重建版人格测试页面。评分模型和题目结构来自对公开页面的静态分析，
+              站点实现、界面设计、部署流程与可复用代码由本仓库重写。
+            </p>
+            <div class="hero-actions">
+              <button id="startBtn" class="btn btn-primary">开始测试</button>
+              <a class="btn btn-ghost" href="https://github.com/fly-pigTH/inverse-sbti" target="_blank" rel="noreferrer">
+                查看源码
+              </a>
+            </div>
+          </div>
+
+          <div class="hero-side">
+            <div class="manifest-card">
+              <div class="manifest-top">
+                <span>CASE FILE</span>
+                <strong>15 维 / 25 模板 / 隐藏分支</strong>
+              </div>
+              <ul>
+                <li>30 道常规题，2 道特殊门题</li>
+                <li>支持结果复现、维度解释、Top 3 匹配</li>
+                <li>不包含原站图片资源，结果海报为本仓库程序化生成</li>
+              </ul>
+            </div>
+
+            <div class="credit-card">
+              <div class="stamp">TRIBUTE</div>
+              <p>致敬公开站点 <a href="https://sbti.unun.dev/" target="_blank" rel="noreferrer">sbti.unun.dev</a></p>
+              <p>页面中标注的原作者：B站 @蛆肉儿串儿</p>
+              <p>当前站点为非官方重建版，仅供学习研究。</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="testScreen" class="screen">
+        <div class="panel test-panel">
+          <div class="test-head">
+            <div>
+              <div class="eyebrow">Questionnaire</div>
+              <h2>全量选择测试</h2>
+            </div>
+            <div class="progress-shell">
+              <div class="progress-bar"><span id="progressBar"></span></div>
+              <div class="progress-meta">
+                <span id="progressText">0 / 31</span>
+                <span id="progressHint">题目顺序会随机打乱</span>
+              </div>
+            </div>
+          </div>
+
+          <div id="questionList" class="question-list"></div>
+
+          <div class="test-actions">
+            <p id="testHint" class="subtle">全选完才会放行。世界已经够乱了，起码把题做完整。</p>
+            <div class="action-row">
+              <button id="backHomeBtn" class="btn btn-ghost">返回首页</button>
+              <button id="submitBtn" class="btn btn-primary" disabled>提交并查看结果</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="resultScreen" class="screen">
+        <div class="panel result-panel">
+          <div class="result-top">
+            <div id="posterCard" class="poster-card">
+              <div class="poster-header">
+                <span class="poster-kicker" id="resultModeKicker">你的主类型</span>
+                <span class="poster-code" id="posterCode">CTRL</span>
+              </div>
+              <div class="poster-main">
+                <h2 id="resultTypeName">CTRL（拿捏者）</h2>
+                <p id="resultIntro">怎么样，被我拿捏了吧？</p>
+              </div>
+              <div class="poster-footer">
+                <span id="matchBadge" class="match-badge">匹配度 92%</span>
+                <span class="poster-tag">Open SBTI</span>
+              </div>
+            </div>
+
+            <div class="result-summary">
+              <div class="summary-card">
+                <div class="eyebrow">Result</div>
+                <h3 id="resultAlias">系统备注会显示在这里。</h3>
+                <p id="resultDesc"></p>
+              </div>
+
+              <div class="summary-card">
+                <div class="eyebrow">Top 3</div>
+                <div id="topMatches" class="top-matches"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="result-grid">
+            <div class="summary-card">
+              <div class="eyebrow">十五维度</div>
+              <div id="dimList" class="dim-list"></div>
+            </div>
+
+            <div class="summary-card note-card">
+              <div class="eyebrow">说明</div>
+              <p id="funNote"></p>
+              <div class="note-divider"></div>
+              <p>
+                致敬原站，但本站不是官方镜像。图片资源未复用，页面为开源重建实现。
+              </p>
+            </div>
+          </div>
+
+          <div class="test-actions">
+            <p class="subtle">结果仅供娱乐和研究参考，不建议用于诊断、招聘、相亲或人生决策。</p>
+            <div class="action-row">
+              <button id="restartBtn" class="btn btn-ghost">重新测试</button>
+              <button id="toTopBtn" class="btn btn-primary">回到首页</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

@@ -20,14 +20,17 @@ Please read [ATTRIBUTION.md](./ATTRIBUTION.md) before reusing anything from this
 - Static-analysis helpers to extract questions, hidden branches, and type patterns
 - A parity checker that compares the local model against the original in-page `computeResult()` logic
 - A report generator that enumerates the reachable result space
+- A deployable static tribute site under `site/`, intended for GitHub Pages
 
 ## What This Repo Does Not Bundle
 
 - The upstream HTML snapshot by default
 - The upstream image assets
-- Generated output files that contain upstream-derived content
+- Reverse-engineering output files under `output/`
 
 Those files are intentionally gitignored. Fetch them locally when you need them.
+
+Note: the deployed site under `site/` does include upstream-derived questionnaire text and result copy so the rebuild can function. That content remains attributed to the upstream project and is not relicensed under MIT.
 
 ## Quick Start
 
@@ -55,6 +58,12 @@ npm run summary
 node scripts/reverse-sbti.mjs sample CTRL
 ```
 
+Regenerate the browser data payload used by the deployable site:
+
+```bash
+npm run export:site-data
+```
+
 ## Repository Layout
 
 - `scripts/fetch-site.mjs`: fetches `https://sbti.unun.dev/` into a local `site.html`
@@ -62,6 +71,7 @@ node scripts/reverse-sbti.mjs sample CTRL
 - `scripts/reverse-sbti.mjs`: enumerates the result space and writes local reports
 - `scripts/lib/site-data.mjs`: extracts constants and runtime objects from the fetched page
 - `scripts/lib/scoring.mjs`: local scoring model used for analysis
+- `site/`: deployable static tribute rebuild for GitHub Pages
 - `ATTRIBUTION.md`: upstream attribution and scope boundaries
 
 ## Current Findings
@@ -78,7 +88,7 @@ Based on the analyzed public page snapshot:
 ## Legal and Scope Notes
 
 - This repository is not the original project and should not be presented as such.
-- The MIT license in this repository applies to the code and documentation written here, not to upstream site content.
+- The MIT license in this repository applies to the code and documentation written here, not to upstream site content or upstream-derived copy bundled inside `site/data.js`.
 - Rights to the original site content remain with the upstream author/site owner.
 - Use this repository for learning, research, and reverse-engineering practice.
 
