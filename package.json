@@ -1,0 +1,18 @@
+{
+  "name": "inverse-sbti",
+  "version": "0.1.0",
+  "private": false,
+  "type": "module",
+  "description": "Tribute reverse-engineering study of sbti.unun.dev for learning and research.",
+  "scripts": {
+    "fetch": "node scripts/fetch-site.mjs",
+    "verify": "node scripts/verify-parity.mjs",
+    "report": "node scripts/reverse-sbti.mjs report",
+    "summary": "node scripts/reverse-sbti.mjs summary",
+    "sample": "node scripts/reverse-sbti.mjs sample CTRL"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "MIT"
+}
