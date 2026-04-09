@@ -3,7 +3,10 @@ import { sbtiData } from './data.js';
 const state = {
   shuffledQuestions: [],
   answers: {},
-  result: null
+  result: null,
+  activeQuestionId: null,
+  previewQuestionId: null,
+  previewValue: null
 };
 
 const els = {
@@ -16,6 +19,11 @@ const els = {
   restartBtn: document.getElementById('restartBtn'),
   toTopBtn: document.getElementById('toTopBtn'),
   questionList: document.getElementById('questionList'),
+  vectorPanel: document.getElementById('vectorPanel'),
+  vectorTypePreview: document.getElementById('vectorTypePreview'),
+  vectorFocus: document.getElementById('vectorFocus'),
+  vectorBranchHint: document.getElementById('vectorBranchHint'),
+  vectorGrid: document.getElementById('vectorGrid'),
   progressBar: document.getElementById('progressBar'),
   progressText: document.getElementById('progressText'),
   progressHint: document.getElementById('progressHint'),
@@ -34,6 +42,7 @@ const els = {
 };
 
 const optionCodes = ['A', 'B', 'C', 'D'];
+const desktopMedia = window.matchMedia('(min-width: 981px)');
 
 function init() {
   bindEvents();
@@ -46,6 +55,8 @@ function bindEvents() {
   els.submitBtn.addEventListener('click', submitTest);
   els.restartBtn.addEventListener('click', startTest);
   els.toTopBtn.addEventListener('click', () => showScreen('home'));
+  window.addEventListener('scroll', handleViewportChange, { passive: true });
+  window.addEventListener('resize', handleViewportChange, { passive: true });
 }
 
 function showScreen(name) {
@@ -62,6 +73,9 @@ function renderHome() {
 function startTest() {
   state.answers = {};
   state.result = null;
+  state.activeQuestionId = null;
+  state.previewQuestionId = null;
+  state.previewValue = null;
 
   const shuffledRegular = shuffleArray(sbtiData.questions);
   const insertIndex = Math.floor(Math.random() * shuffledRegular.length) + 1;
@@ -71,8 +85,8 @@ function startTest() {
     ...shuffledRegular.slice(insertIndex)
   ];
 
-  renderQuestions();
   showScreen('test');
+  renderQuestions();
 }
 
 function getVisibleQuestions() {
@@ -91,7 +105,7 @@ function renderQuestions() {
     const optionsHtml = question.options.map((option, optionIndex) => {
       const checked = state.answers[question.id] === option.value ? 'checked' : '';
       return `
-        <label class="option">
+        <label class="option" data-question-id="${question.id}" data-value="${option.value}">
           <input type="radio" name="${question.id}" value="${option.value}" ${checked} />
           <span class="option-code">${optionCodes[optionIndex] ?? optionIndex + 1}</span>
           <span>${escapeHtml(option.label)}</span>
@@ -100,7 +114,7 @@ function renderQuestions() {
     }).join('');
 
     return `
-      <article class="question-card">
+      <article class="question-card" data-question-id="${question.id}" data-dim="${question.dim ?? ''}">
         <div class="question-head">
           <span class="question-index">第 ${index + 1} 题</span>
           <span class="question-dim">${dimLabel}</span>
@@ -115,7 +129,24 @@ function renderQuestions() {
     input.addEventListener('change', handleAnswerChange);
   });
 
+  els.questionList.querySelectorAll('.option').forEach((option) => {
+    option.addEventListener('pointerenter', () => {
+      setPreview(option.dataset.questionId, Number(option.dataset.value));
+    });
+    option.addEventListener('pointerleave', () => {
+      clearPreview(option.dataset.questionId);
+    });
+    option.addEventListener('focusin', () => {
+      setPreview(option.dataset.questionId, Number(option.dataset.value));
+    });
+    option.addEventListener('focusout', () => {
+      clearPreview(option.dataset.questionId);
+    });
+  });
+
   updateProgress();
+  updateActiveQuestionFromViewport(true);
+  renderVectorMonitor();
 }
 
 function handleAnswerChange(event) {
@@ -131,6 +162,7 @@ function handleAnswerChange(event) {
   }
 
   updateProgress();
+  renderVectorMonitor();
 }
 
 function updateProgress() {
@@ -148,6 +180,65 @@ function updateProgress() {
     : '全选完才会放行。世界已经够乱了，起码把题做完整。';
 }
 
+function handleViewportChange() {
+  if (!els.testScreen.classList.contains('active')) {
+    return;
+  }
+  updateActiveQuestionFromViewport();
+}
+
+function updateActiveQuestionFromViewport(force = false) {
+  const cards = [...els.questionList.querySelectorAll('.question-card')];
+  if (!cards.length) {
+    return;
+  }
+
+  const anchor = desktopMedia.matches ? 144 : 110;
+  let bestCard = cards[0];
+  let bestDistance = Number.POSITIVE_INFINITY;
+
+  cards.forEach((card) => {
+    const rect = card.getBoundingClientRect();
+    if (rect.bottom < anchor - 40) {
+      return;
+    }
+
+    const scorePoint = rect.top + Math.min(rect.height * 0.28, 120);
+    const distance = Math.abs(scorePoint - anchor);
+    if (distance < bestDistance) {
+      bestDistance = distance;
+      bestCard = card;
+    }
+  });
+
+  if (force || state.activeQuestionId !== bestCard.dataset.questionId) {
+    state.activeQuestionId = bestCard.dataset.questionId;
+    applyActiveQuestionClass();
+    renderVectorMonitor();
+  }
+}
+
+function applyActiveQuestionClass() {
+  els.questionList.querySelectorAll('.question-card').forEach((card) => {
+    card.classList.toggle('is-active-question', card.dataset.questionId === state.activeQuestionId);
+  });
+}
+
+function setPreview(questionId, value) {
+  state.previewQuestionId = questionId;
+  state.previewValue = value;
+  renderVectorMonitor();
+}
+
+function clearPreview(questionId) {
+  if (state.previewQuestionId !== questionId) {
+    return;
+  }
+  state.previewQuestionId = null;
+  state.previewValue = null;
+  renderVectorMonitor();
+}
+
 function submitTest() {
   state.result = computeResult();
   renderResult();
@@ -155,13 +246,17 @@ function submitTest() {
 }
 
 function computeResult() {
+  return computeSnapshot(state.answers);
+}
+
+function computeSnapshot(answerState) {
   const rawScores = {};
   sbtiData.dimensionOrder.forEach((dim) => {
     rawScores[dim] = 0;
   });
 
   sbtiData.questions.forEach((question) => {
-    rawScores[question.dim] += Number(state.answers[question.id] || 0);
+    rawScores[question.dim] += Number(answerState[question.id] || 0);
   });
 
   const levels = {};
@@ -196,7 +291,7 @@ function computeResult() {
   });
 
   const bestNormal = ranked[0];
-  const drunkTriggered = state.answers[sbtiData.drunkTriggerQuestionId] === 2;
+  const drunkTriggered = answerState[sbtiData.drunkTriggerQuestionId] === 2;
 
   let finalType;
   let modeKicker = '你的主类型';
@@ -223,6 +318,7 @@ function computeResult() {
   return {
     rawScores,
     levels,
+    userVector,
     ranked,
     bestNormal,
     finalType,
@@ -231,6 +327,113 @@ function computeResult() {
     alias,
     special
   };
+}
+
+function renderVectorMonitor() {
+  const visibleQuestions = getVisibleQuestions();
+  const activeQuestion = visibleQuestions.find((question) => question.id === state.activeQuestionId) ?? visibleQuestions[0];
+  const baseSnapshot = computeSnapshot(state.answers);
+  const previewAnswers = buildPreviewAnswers(activeQuestion);
+  const previewSnapshot = computeSnapshot(previewAnswers);
+  const answered = visibleQuestions.filter((question) => state.answers[question.id] !== undefined).length;
+  const total = visibleQuestions.length;
+  const hasPreview = Boolean(activeQuestion && state.previewQuestionId === activeQuestion.id && state.previewValue !== null);
+  const currentValue = activeQuestion ? Number(state.answers[activeQuestion.id] || 0) : 0;
+  const effectivePreviewValue = hasPreview ? state.previewValue : currentValue;
+
+  if (!activeQuestion) {
+    return;
+  }
+
+  els.vectorTypePreview.textContent = answered > 0
+    ? `已答 ${answered}/${total} · 临时靠近 ${previewSnapshot.finalType.code}`
+    : '等待作答';
+
+  if (activeQuestion.special) {
+    els.vectorFocus.textContent = activeQuestion.id === sbtiData.specialQuestions[0].id
+      ? '当前是分支门题。它不会直接改变 15 维向量，但会决定是否展开饮酒隐藏支线。'
+      : '当前是隐藏分支题。它不会改变 15 维向量，但可能直接覆盖最终人格结果。';
+    els.vectorBranchHint.textContent = buildSpecialBranchHint(activeQuestion, effectivePreviewValue);
+  } else {
+    const dim = activeQuestion.dim;
+    const meta = sbtiData.dimensionMeta[dim];
+    const option = activeQuestion.options.find((item) => item.value === effectivePreviewValue);
+    const baseRaw = baseSnapshot.rawScores[dim];
+    const baseLevel = baseSnapshot.levels[dim];
+    const nextRaw = previewSnapshot.rawScores[dim];
+    const nextLevel = previewSnapshot.levels[dim];
+
+    els.vectorFocus.textContent = hasPreview
+      ? `当前题影响 ${meta.name}。若选 ${optionCodes[Math.max(0, activeQuestion.options.findIndex((item) => item.value === effectivePreviewValue))]}，该维度会从 ${baseLevel}/${baseRaw} 分变化到 ${nextLevel}/${nextRaw} 分。`
+      : `当前锁定 ${meta.name}。选择本题选项后，这个维度会立刻在右侧向量里更新。`;
+
+    els.vectorBranchHint.textContent = previewSnapshot.finalType.code !== baseSnapshot.finalType.code
+      ? `当前预览会让临时靠近人格从 ${baseSnapshot.finalType.code} 变为 ${previewSnapshot.finalType.code}。`
+      : `当前预览下，临时靠近人格仍是 ${previewSnapshot.finalType.code}。`;
+  }
+
+  els.vectorGrid.innerHTML = sbtiData.dimensionOrder.map((dim) => {
+    const baseLevel = baseSnapshot.levels[dim];
+    const previewLevel = previewSnapshot.levels[dim];
+    const baseRaw = baseSnapshot.rawScores[dim];
+    const previewRaw = previewSnapshot.rawScores[dim];
+    const isActiveDim = !activeQuestion.special && activeQuestion.dim === dim;
+    const isChanged = baseLevel !== previewLevel || baseRaw !== previewRaw;
+    const classes = [
+      'vector-node',
+      isActiveDim ? 'is-active-dim' : '',
+      isChanged ? 'is-preview-change' : ''
+    ].filter(Boolean).join(' ');
+
+    return `
+      <div class="${classes}">
+        <div class="vector-node-top">
+          <span class="vector-node-code">${dim}</span>
+          <span class="vector-node-name">${sbtiData.dimensionMeta[dim].name}</span>
+        </div>
+        <div class="vector-node-main">
+          <strong class="vector-node-level">${previewLevel}</strong>
+          <span class="vector-node-score">${previewRaw} 分</span>
+        </div>
+        <div class="vector-node-sub">
+          ${isChanged
+            ? `<span>${baseLevel}/${baseRaw}</span><span class="vector-node-arrow">→</span><span>${previewLevel}/${previewRaw}</span>`
+            : `<span>当前稳定</span>`}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function buildPreviewAnswers(activeQuestion) {
+  const previewAnswers = { ...state.answers };
+
+  if (!activeQuestion) {
+    return previewAnswers;
+  }
+
+  const hasPreview = state.previewQuestionId === activeQuestion.id && state.previewValue !== null;
+  if (hasPreview) {
+    previewAnswers[activeQuestion.id] = state.previewValue;
+  }
+
+  if (activeQuestion.id === sbtiData.specialQuestions[0].id && previewAnswers[activeQuestion.id] !== 3) {
+    delete previewAnswers[sbtiData.specialQuestions[1].id];
+  }
+
+  return previewAnswers;
+}
+
+function buildSpecialBranchHint(question, value) {
+  if (question.id === sbtiData.specialQuestions[0].id) {
+    return value === 3
+      ? '当前预览会展开第 32 题饮酒支线，但 15 维向量本身不变。'
+      : '当前预览不会展开饮酒支线，后面的常规向量判断保持默认路径。';
+  }
+
+  return value === 2
+    ? '当前预览会触发 DRUNK 隐藏人格，直接覆盖常规模板匹配。'
+    : '当前预览不会触发 DRUNK 覆盖，最终结果仍按 15 维模板匹配。';
 }
 
 function renderResult() {

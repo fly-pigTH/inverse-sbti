@@ -81,7 +81,31 @@
             </div>
           </div>
 
-          <div id="questionList" class="question-list"></div>
+          <div class="test-main">
+            <div class="test-column">
+              <div id="questionList" class="question-list"></div>
+            </div>
+
+            <aside id="vectorPanel" class="summary-card vector-panel">
+              <div class="vector-panel-head">
+                <div>
+                  <div class="eyebrow">Live Vector</div>
+                  <h3>属性向量监视器</h3>
+                </div>
+                <div id="vectorTypePreview" class="vector-type-preview">等待作答</div>
+              </div>
+
+              <p id="vectorFocus" class="vector-focus">
+                滚动到某一题时，这里会锁定它影响的维度；悬停或选择选项时，会预览向量变化。
+              </p>
+
+              <div id="vectorBranchHint" class="vector-branch-hint">
+                常规题只会影响一个维度，两道题合并后才会映射成 L / M / H。
+              </div>
+
+              <div id="vectorGrid" class="vector-grid"></div>
+            </aside>
+          </div>
 
           <div class="test-actions">
             <p id="testHint" class="subtle">全选完才会放行。世界已经够乱了，起码把题做完整。</p>
