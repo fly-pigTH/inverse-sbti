@@ -1,56 +1,68 @@
 # inverse-sbti
 
-A tribute reverse-engineering study of `https://sbti.unun.dev/`, built for learning and research.
+[![English](https://img.shields.io/badge/README-English-1f6feb?style=for-the-badge)](./README.en.md)
 
-中文版本见 [README.zh-CN.md](./README.zh-CN.md).
+这是一个面向学习与研究的逆向分析仓库，用来致敬 `https://sbti.unun.dev/` 上公开可访问的 `SBTI 人格测试` 页面。
 
-## Tribute
+## 项目介绍
 
-This repository is dedicated to the public `SBTI 人格测试` page hosted at `sbti.unun.dev`.
+本仓库基于对公开页面的静态分析，整理出一套可复现、可验证、可部署的开源研究版本，目标不是伪装成原项目镜像，而是把以下内容沉淀下来：
 
-- Upstream site: `https://sbti.unun.dev/`
-- Original author shown on the site: `B站 @蛆肉儿串儿`
-- Repository status: unofficial, independent, research-only
+- 题库与隐藏分支的结构分析
+- 人格分类算法的本地复刻
+- 与上游 `computeResult()` 的一致性校验
+- 一个可部署到 GitHub Pages 的开源重建版前端
 
-Please read [ATTRIBUTION.md](./ATTRIBUTION.md) before reusing anything from this repository.
+当前仓库默认以中文介绍为主，英文说明请点击顶部按钮进入 [README.en.md](./README.en.md)。
 
-## What This Repo Contains
+## 致敬与说明
 
-- Local tooling to fetch the public site snapshot on demand
-- Static-analysis helpers to extract questions, hidden branches, and type patterns
-- A parity checker that compares the local model against the original in-page `computeResult()` logic
-- A report generator that enumerates the reachable result space
-- A deployable static tribute site under `site/`, intended for GitHub Pages
+本仓库致敬的上游页面：
 
-## What This Repo Does Not Bundle
+- 上游站点：`https://sbti.unun.dev/`
+- 页面名称：`SBTI 人格测试`
+- 页面中标注的原作者：`B站 @蛆肉儿串儿`
+- 仓库性质：非官方、独立整理、仅供学习研究
 
-- The upstream HTML snapshot by default
-- The upstream image assets
-- Reverse-engineering output files under `output/`
+在复用本仓库前，请先阅读 [ATTRIBUTION.md](./ATTRIBUTION.md)。
 
-Those files are intentionally gitignored. Fetch them locally when you need them.
+## 仓库包含什么
 
-Note: the deployed site under `site/` does include upstream-derived questionnaire text and result copy so the rebuild can function. That content remains attributed to the upstream project and is not relicensed under MIT.
+- 按需抓取公开页面快照的本地脚本
+- 提取题库、隐藏分支和人格模板的静态分析脚本
+- 将本地复刻逻辑与原页面 `computeResult()` 做一致性校验的脚本
+- 用于全量枚举结果空间并生成本地报告的脚本
+- 一个可直接部署到 GitHub Pages 的静态致敬版站点，位于 `site/`
 
-## Quick Start
+## 仓库默认不包含什么
 
-Requirements:
+- 上游页面抓取下来的 HTML 快照
+- 上游图片资源
+- `output/` 下的逆向分析生成文件
+
+这些文件默认都被 `.gitignore` 忽略。需要时请自行在本地抓取。
+
+需要说明的是：为了让开源重建版站点可以独立运行，`site/data.js` 中包含了基于公开页面提取的题目文案、人格名称和结果文案。这部分内容仍归上游项目所有，不随本仓库的 MIT 许可重新授权。
+
+## 快速开始
+
+环境要求：
 
 - Node.js 20+
 
-Fetch the current public page locally:
+先抓取当前公开页面到本地：
 
 ```bash
 npm run fetch
 ```
 
-Verify that the local reimplementation matches the upstream runtime logic:
+再验证本地复刻逻辑和上游运行时逻辑是否一致：
 
 ```bash
 npm run verify
 ```
 
-Generate summary and sample outputs locally:
+生成本地报告和样例输出：
 
 ```bash
 npm run report
@@ -58,47 +70,47 @@ npm run summary
 node scripts/reverse-sbti.mjs sample CTRL
 ```
 
-Regenerate the browser data payload used by the deployable site:
+重新生成部署站点使用的数据文件：
 
 ```bash
 npm run export:site-data
 ```
 
-## Repository Layout
+## 仓库结构
 
-- `scripts/fetch-site.mjs`: fetches `https://sbti.unun.dev/` into a local `site.html`
-- `scripts/verify-parity.mjs`: checks local scoring against the upstream `computeResult()`
-- `scripts/reverse-sbti.mjs`: enumerates the result space and writes local reports
-- `scripts/lib/site-data.mjs`: extracts constants and runtime objects from the fetched page
-- `scripts/lib/scoring.mjs`: local scoring model used for analysis
-- `site/`: deployable static tribute rebuild for GitHub Pages
-- `ATTRIBUTION.md`: upstream attribution and scope boundaries
+- `scripts/fetch-site.mjs`：抓取 `https://sbti.unun.dev/` 并保存为本地 `site.html`
+- `scripts/verify-parity.mjs`：校验本地评分逻辑与上游页面 `computeResult()`
+- `scripts/reverse-sbti.mjs`：全量枚举结果空间并生成本地报告
+- `scripts/lib/site-data.mjs`：从抓取到的页面中提取常量和运行时对象
+- `scripts/lib/scoring.mjs`：本地评分模型
+- `site/`：可部署到 GitHub Pages 的静态致敬重建版
+- `ATTRIBUTION.md`：上游归属与使用边界说明
 
-## Current Findings
+## 当前结论
 
-Based on the analyzed public page snapshot:
+基于当前分析到的公开页面快照：
 
-- There are 30 regular questions mapped onto 15 dimensions, 2 questions per dimension.
-- The visible test shows 31 questions by default because one special gate question is inserted at runtime.
-- Choosing `饮酒` reveals an extra question, so that branch has 32 visible questions.
-- Normal typing is a nearest-neighbor match against 25 hard-coded patterns.
-- A hidden `DRUNK` override can bypass the normal result.
-- A low-similarity fallback can force the `HHHH` result.
+- 常规题一共 30 道，映射到 15 个维度，每个维度 2 题
+- 页面默认显示 31 题，因为运行时会随机插入 1 道特殊门题
+- 选择 `饮酒` 后会额外出现 1 道题，因此该分支可见题数为 32
+- 正常人格结果来自 25 个硬编码模板的最近邻匹配
+- 页面里存在一个会覆盖正常结果的隐藏 `DRUNK` 分支
+- 页面里也存在一个低相似度时触发的 `HHHH` 兜底结果
 
-## Legal and Scope Notes
+## 法律与边界
 
-- This repository is not the original project and should not be presented as such.
-- The MIT license in this repository applies to the code and documentation written here, not to upstream site content or upstream-derived copy bundled inside `site/data.js`.
-- Rights to the original site content remain with the upstream author/site owner.
-- Use this repository for learning, research, and reverse-engineering practice.
+- 本仓库不是原项目，也不应被表述为原项目镜像
+- 本仓库中的 MIT 许可仅适用于这里自行编写的代码和文档，不适用于上游页面内容，也不适用于 `site/data.js` 中的上游派生文案
+- 原始页面内容的权利仍归上游作者或站点所有者
+- 本仓库仅用于学习、研究和逆向分析方法演示
 
-## Verification
+## 校验范围
 
-The included parity checker currently validates:
+仓库自带的一致性校验目前覆盖：
 
-- all 25 normal exact-pattern hits
-- a forced `HHHH` fallback case
-- a forced `DRUNK` override case
-- 200 random answer sets
+- 25 个正常人格模板的精确命中
+- 1 个强制触发 `HHHH` 的兜底样例
+- 1 个强制触发 `DRUNK` 的覆盖样例
+- 200 组随机答案
 
-If `npm run verify` returns `"status": "ok"`, the local model matches the fetched upstream page for those checks.
+如果 `npm run verify` 输出 `"status": "ok"`，说明对于这些校验样例，本地模型与当前抓取的上游页面逻辑一致。
