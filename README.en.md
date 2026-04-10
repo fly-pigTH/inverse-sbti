@@ -1,4 +1,4 @@
-# inverse-sbti
+# OPEN_SBTI_TEST
 
 [![中文](https://img.shields.io/badge/README-%E4%B8%AD%E6%96%87-cb6d51?style=for-the-badge)](./README.md)
 
@@ -14,6 +14,27 @@ This repository turns the public `SBTI 人格测试` page into a reproducible re
 - shipping a deployable GitHub Pages rebuild
 
 The default repository landing page is now Chinese. Use the button above to switch back to the Chinese homepage at any time.
+
+## How the Test Works
+
+This learning-oriented rebuild does not try to restate a vague personality theory. It documents the actual classification flow used by the public page:
+
+- The main questionnaire contains 30 regular questions mapped to 15 dimensions, with 2 questions per dimension.
+- Each answer pushes one dimension in a specific direction; after the pair is combined, that dimension collapses into one of `L / M / H`.
+- Once all dimensions are resolved, the page builds a 15-dimensional personality vector.
+- That vector is compared against 25 built-in personality templates, and the closest match becomes the normal result.
+- The runtime also contains special branch rules. For example, the drinking-related branch can reveal hidden questions and may override the normal result with a special type.
+- If the final vector is not close enough to any template, the flow falls back to a low-similarity default result.
+
+In practice, this is a “discrete multi-dimension scoring + nearest-template matching + special-rule override” classifier.
+
+## Feature Highlights
+
+- Personality vector analysis: the test page includes a live vector monitor. When you scroll to a question, it locks onto the affected dimension; when you hover or choose an answer, it previews the vector change immediately.
+- Result reproduction and explanation: the rebuilt result view shows the final type, top-3 nearby matches, the final dimension vector, and a short explanation of the match.
+- Parity verification: the local scoring model can be checked against the upstream `computeResult()` implementation instead of relying on guesswork.
+- Mobile adaptation: the questionnaire, progress area, vector panel, and result layout were adjusted for narrow screens so the experience remains usable on phones.
+- GitHub Pages deployment: the site is a fully static frontend and can be published directly for demos and research.
 
 ## Tribute
 

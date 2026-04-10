@@ -8,7 +8,7 @@ const OUTPUT_PATH = 'site.html';
 async function main() {
   const response = await fetch(SOURCE_URL, {
     headers: {
-      'user-agent': 'inverse-sbti research fetcher'
+      'user-agent': 'open-sbti-test research fetcher'
     }
   });
 
