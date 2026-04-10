@@ -2,39 +2,39 @@
 
 [![中文](https://img.shields.io/badge/README-%E4%B8%AD%E6%96%87-cb6d51?style=for-the-badge)](./README.md)
 
-A tribute reverse-engineering study of `https://sbti.unun.dev/`, built for learning and research.
+A simple open-source learning version of the `SBTI` test, inspired by the public page at `https://sbti.unun.dev/`.
 
 ## Project Overview
 
-This repository turns the public `SBTI 人格测试` page into a reproducible research project rather than pretending to be the original source repository. It focuses on:
+This project keeps the goal simple: make an interesting personality test easy to run, easy to read, and easy to keep exploring.
 
-- extracting the questionnaire structure and hidden branches
-- reproducing the personality classification algorithm locally
-- verifying parity against the upstream `computeResult()` logic
-- shipping a deployable GitHub Pages rebuild
+- you can take the test directly
+- you can watch the personality vector change while answering
+- you can read the code and understand how the result is decided
+- you can deploy it as a static site on GitHub Pages
 
 The default repository landing page is now Chinese. Use the button above to switch back to the Chinese homepage at any time.
 
 ## How the Test Works
 
-This learning-oriented rebuild does not try to restate a vague personality theory. It documents the actual classification flow used by the public page:
+You can think of this test as a process that keeps adding up your tendencies while you answer:
 
-- The main questionnaire contains 30 regular questions mapped to 15 dimensions, with 2 questions per dimension.
-- Each answer pushes one dimension in a specific direction; after the pair is combined, that dimension collapses into one of `L / M / H`.
-- Once all dimensions are resolved, the page builds a 15-dimensional personality vector.
-- That vector is compared against 25 built-in personality templates, and the closest match becomes the normal result.
-- The runtime also contains special branch rules. For example, the drinking-related branch can reveal hidden questions and may override the normal result with a special type.
-- If the final vector is not close enough to any template, the flow falls back to a low-similarity default result.
+- The main flow has 30 regular questions across 15 traits.
+- Each answer pushes one trait a little in one direction.
+- Two related questions are combined into the final state of that trait.
+- All traits together become your personality vector for this run.
+- The system compares that vector with built-in personality patterns and picks the closest one.
+- Some hidden branches can insert special questions or even override the final result.
 
-In practice, this is a “discrete multi-dimension scoring + nearest-template matching + special-rule override” classifier.
+So the result is not magic. It is a process you can inspect and follow.
 
 ## Feature Highlights
 
-- Personality vector analysis: the test page includes a live vector monitor. When you scroll to a question, it locks onto the affected dimension; when you hover or choose an answer, it previews the vector change immediately.
-- Result reproduction and explanation: the rebuilt result view shows the final type, top-3 nearby matches, the final dimension vector, and a short explanation of the match.
-- Parity verification: the local scoring model can be checked against the upstream `computeResult()` implementation instead of relying on guesswork.
-- Mobile adaptation: the questionnaire, progress area, vector panel, and result layout were adjusted for narrow screens so the experience remains usable on phones.
-- GitHub Pages deployment: the site is a fully static frontend and can be published directly for demos and research.
+- Personality vector view: when you scroll to a question, the page locks onto the trait it affects; once you choose an answer, you can see the vector move right away.
+- Clearer results: the result page shows not only your final type, but also nearby matches.
+- Better on phones: the layout was adjusted for mobile so reading, answering, and checking results feels easier on a small screen.
+- Easy to keep exploring: the code and the site are open, so it is straightforward to study, redesign, or extend.
+- Easy to deploy: it is a static site and works well with GitHub Pages.
 
 ## Tribute
 
